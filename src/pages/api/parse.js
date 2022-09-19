@@ -636,10 +636,11 @@ export default function handler(req, res) {
     }
 
     // Clean up the string and replace reserved characters
-    const fileName = `${feed.title
-      .replace(/\s+/g, "-")
-      .replace(/[/\\?%*:|"<>]/g, "")
-      .toLowerCase()}.json`;
+    // const fileName = `${feed.title
+    //   .replace(/\s+/g, "-")
+    //   .replace(/[/\\?%*:|"<>]/g, "")
+    //   .toLowerCase()}.json`;
+    const fileName = "g1.json";
 
     // Add the items to the items array
     await Promise.all(

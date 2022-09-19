@@ -5,12 +5,26 @@ import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
-import { TextField } from "@mui/material";
-import { useState } from "react";
+import { Fab, TextField } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import FormDialog from "../components/Dialog";
+import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
+import ArrowCircleUpOutlinedIcon from "@mui/icons-material/ArrowCircleUpOutlined";
+import toast from "react-hot-toast";
+import ClearLikes from "../components/ClearLikes";
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [refresh, setRefresh] = useState(false);
+  const [likes, setLikes] = useState([]);
+  const [aux, setAux] = useState([]);
+
+  useEffect(() => {
+    setLikes(localStorage.getItem("news"));
+    setAux(localStorage.getItem("all"));
+  }, [refresh]);
+
+  console.log(aux);
 
   function findCommonElement(arr1, arr2) {
     // Create an empty object
@@ -40,6 +54,27 @@ export default function Home() {
     return false;
   }
 
+  const sectionsRefs = useRef([]);
+  sectionsRefs.current = [];
+  const addToRefs = (el) => {
+    if (el && !sectionsRefs.current.includes(el)) {
+      sectionsRefs.current.push(el);
+    }
+  };
+  const scroll = (param) => {
+    setSearch("");
+    const parte = sectionsRefs.current.filter((section) => {
+      if (section.innerText === param) {
+        return section;
+      }
+    });
+    try {
+      window.scrollTo({ top: parte[0].offsetTop - 95, behavior: "smooth" });
+    } catch (e) {
+      setRefresh(true);
+    }
+  };
+
   return (
     <>
       <Box
@@ -51,6 +86,21 @@ export default function Home() {
           width: "100vw",
         }}
       >
+        <Fab
+          style={{
+            position: "fixed",
+            bottom: "10%",
+            right: "4%",
+            marginTop: "auto",
+          }}
+          color="default"
+          aria-label="navigate"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          <ArrowCircleUpOutlinedIcon />
+        </Fab>
         <Box
           styleSheet={{
             display: "flex",
@@ -69,13 +119,22 @@ export default function Home() {
           <TextField
             fullWidth
             id="filled-search"
-            label="Search field"
+            label="Buscar notícia"
             type="search"
             variant="filled"
+            value={search}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
           />
+          <Box
+            styleSheet={{
+              display: "flex",
+            }}
+          >
+            <FormDialog/>
+            <ClearLikes />
+          </Box>
         </Box>
         {arquivo
           .filter((val) => {
@@ -89,6 +148,9 @@ export default function Home() {
           })
           .map((item) => {
             const auxDate = new Date(item.pubDate);
+            if (likes.includes(item.title)) {
+              item.liked = true;
+            }
             return (
               <Box
                 key={item.id}
@@ -105,8 +167,8 @@ export default function Home() {
                   borderRadius: "2%",
                 }}
               >
-                <Box>
-                  <h2>{item.title}</h2>
+                <Box key={Math.random()}>
+                  <h2 ref={addToRefs}>{item.title}</h2>
                   <p>
                     <em>{item.subTitle}</em>
                   </p>
@@ -137,6 +199,7 @@ export default function Home() {
                     }}
                     onClick={() => {
                       item.liked = !item.liked;
+                      localStorage.setItem("news", [likes, `${item.title}`]);
                       setRefresh(!refresh);
                     }}
                   >
@@ -156,9 +219,30 @@ export default function Home() {
                       return;
                     }
                     return (
-                      (findCommonElement(news.topics, item.topics) && item.liked) && (
-                        <li> - {news.title}</li>
-                      )
+                      <>
+                        {findCommonElement(news.topics, item.topics) &&
+                          item.liked && (
+                            <li
+                              onClick={() => {
+                                setSearch("");
+                                setRefresh(true);
+                                scroll(news.title);
+                              }}
+                            >
+                              {" "}
+                              <Box
+                                className="news-links"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  marginBottom: "1%",
+                                }}
+                              >
+                                <OpenInNewOutlinedIcon /> {news.title}
+                              </Box>
+                            </li>
+                          )}
+                      </>
                     );
                   })}
                 </lu>

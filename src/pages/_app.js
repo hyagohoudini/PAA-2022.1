@@ -1,8 +1,10 @@
+import { Toaster } from "react-hot-toast";
 import "../../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      <Toaster />
       <GlobalStyle />
       <Component {...pageProps} />;
     </>
@@ -39,7 +41,9 @@ function GlobalStyle() {
         cursor: pointer;
         font-weight: 700;
       }
-
+      .news-links {
+        cursor: pointer;
+      }
       a {
         color: blue;
       }
