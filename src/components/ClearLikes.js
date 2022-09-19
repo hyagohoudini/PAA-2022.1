@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import toast from "react-hot-toast";
 
 export default function ClearLikes() {
   const [open, setOpen] = React.useState(false);
@@ -22,6 +23,7 @@ export default function ClearLikes() {
 
   const handleConfirmar = () => {
     localStorage.setItem("news", "");
+    toast.success("Seu histórico foi apagado!");
     setOpen(false);
   };
 
