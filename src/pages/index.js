@@ -21,6 +21,9 @@ export default function Home() {
 
   useEffect(() => {
     setLikes(localStorage.getItem("news"));
+    if (likes === null) {
+      setLikes([]);
+    }
     setAux(localStorage.getItem("all"));
   }, [refresh]);
 
@@ -132,7 +135,7 @@ export default function Home() {
               display: "flex",
             }}
           >
-            <FormDialog/>
+            <FormDialog />
             <ClearLikes />
           </Box>
         </Box>
